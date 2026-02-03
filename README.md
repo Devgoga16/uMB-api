@@ -56,7 +56,13 @@ MONGODB_URI=mongodb://localhost:27017/umb_database
 JWT_SECRET=tu_clave_secreta_super_segura_cambiar_en_produccion
 JWT_EXPIRE=7d
 NODE_ENV=development
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:5173,*
 ```
+
+**Nota sobre CORS:**
+- En desarrollo (`NODE_ENV=development`): Permite todos los orígenes
+- En producción: Solo permite los orígenes especificados en `ALLOWED_ORIGINS`
+- Usa `*` en `ALLOWED_ORIGINS` para permitir todos los orígenes (no recomendado en producción)
 
 3. **Asegurarse de tener MongoDB corriendo**
 
