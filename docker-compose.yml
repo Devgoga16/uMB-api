@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Servicio de la API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: umb-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/umb_database
+      - JWT_SECRET=${JWT_SECRET:-tu_clave_secreta_super_segura_cambiar_en_produccion}
+      - JWT_EXPIRE=7d
+    depends_on:
+      - mongo
+    networks:
+      - umb-network
+    volumes:
+      - ./logs:/app/logs
+
+  # Servicio de MongoDB
+  mongo:
+    image: mongo:7.0
+    container_name: umb-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=umb_database
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+    networks:
+      - umb-network
+
+  # Servicio de Mongo Express (Opcional - UI para MongoDB)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: umb-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    depends_on:
+      - mongo
+    networks:
+      - umb-network
+
+networks:
+  umb-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+  mongo-config:
+    driver: local
